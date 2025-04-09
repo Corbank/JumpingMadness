@@ -1,0 +1,93 @@
+# Jumping Madness
+
+A fun platformer game built with Unity where players test their reflexes by jumping over obstacles and collecting items.
+
+![Jumping Madness Screenshot](screenshots/gameplay.png)
+
+## Play Online
+
+Visit [https://Corbank.github.io/JumpingMadness] to play the game directly in your browser.
+
+## Game Features
+
+- Fast-paced platformer gameplay
+- Challenging obstacles and enemies
+- Collectible items and power-ups
+- Progressive difficulty levels
+- Responsive controls for both desktop and mobile devices
+
+## How to Play
+
+- **Desktop:** Use arrow keys or WASD to move, Space to jump
+- **Mobile:** Touch left/right sides of the screen to move, tap center to jump
+
+## Development Setup
+
+### Prerequisites
+
+- Unity 2020.3 or newer
+- WebGL build support module installed in Unity
+
+### Running Locally
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/JumpingMadness.git
+   ```
+
+2. Open the project in Unity:
+   - Launch Unity Hub
+   - Click "Add" and select the JumpingMadness folder
+   - Open the project
+
+3. To play in the editor:
+   - Open the main scene (Assets/Scenes/MainScene.unity)
+   - Press the Play button
+
+## Hosting the Game
+
+### GitHub Pages
+
+1. Make sure your WebGL build is in a folder named "WebGLBuild" in the repository root
+2. Push your changes to GitHub
+3. Go to your repository settings, select "Pages"
+4. Set the source to "main" branch and save
+5. Your game will be available at https://yourusername.github.io/JumpingMadness
+
+### Local Testing
+
+For testing locally, you need to serve the files using a web server:
+
+```bash
+# Using Python 3
+python -m http.server
+
+# Using Node.js (after installing http-server)
+npx http-server
+```
+
+Then visit `http://localhost:8000` in your browser.
+
+## Troubleshooting
+
+If the game doesn't load:
+
+1. Check if your browser supports WebGL (try Chrome or Firefox)
+2. Make sure you're using a web server, not opening files directly (file:// protocol)
+3. Verify the build files are in the correct location (WebGLBuild/ or Build/ folder)
+4. Check browser console for specific errors
+5. Try clearing your browser cache
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Credits
+
+- Game Design & Development: [Corban Kass, Claude Anthropic Sonnet 3.7]
+- Art Assets: [Anthropic, C.Kass]
+- Special Thanks: [Github Copilot]
+
+## Contact
+
+For questions or feedback, please contact [Corbankass@tinyguystudios.com].
