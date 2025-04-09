@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jumping Madness - Path Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #121212;
+            color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        .status-box {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 5px;
+        }
+        .success {
+            border-left: 5px solid green;
+        }
+        .failure {
+            border-left: 5px solid red;
+        }
+        .instructions {
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jumping Madness - Path Checker</h1>
+        <p>This tool will help diagnose why the game isn't loading properly.</p>
+        
+        <button onclick="checkPaths()">Check Game Paths</button>
+        
+        <div id="results"></div>
+        
+        <div class="instructions">
+            <h2>How to fix common issues:</h2>
+            <ol>
+                <li>Make sure your game build is in the correct location (WebGLBuild/ or Build/ folder)</li>
+                <li>Ensure you're using a web server to host the files (not opening directly from file system)</li>
+                <li>Check that all Unity WebGL files are properly generated (index.html and Build/ subfolder)</li>
+                <li>Verify that your browser supports WebGL (try Chrome or Firefox)</li>
+                <li>Check browser console for additional error messages</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function addResult(path, success, message) {
+            const resultsDiv = document.getElementById('results');
+            const statusClass = success ? 'success' : 'failure';
+            const statusText = success ? 'FOUND' : 'NOT FOUND';
+            
+            resultsDiv.innerHTML += `
+                <div class="status-box ${statusClass}">
+                    <strong>${path}</strong>: ${statusText}<br>
+                    ${message || ''}
+                </div>
+            `;
+        }
+        
+        function checkPaths() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h3>Checking paths...</h3>';
+            
+            const pathsToCheck = [
+                'index.html',
+                'WebGLBuild/index.html',
+                'Build/index.html',
+                'WebGLBuild/Build/webgl.loader.js',
+                'Build/Build/webgl.loader.js'
+            ];
+            
+            let completedChecks = 0;
+            resultsDiv.innerHTML = '';
+            
+            pathsToCheck.forEach(path => {
+                fetch(path)
+                    .then(response => {
+                        if (response.ok) {
+                            addResult(path, true, `Status: ${response.status} ${response.statusText}`);
+                        } else {
+                            addResult(path, false, `Status: ${response.status} ${response.statusText}`);
+                        }
+                    })
+                    .catch(error => {
+                        addResult(path, false, `Error: ${error.message}`);
+                    })
+                    .finally(() => {
+                        completedChecks++;
+                        if (completedChecks === pathsToCheck.length) {
+                            resultsDiv.innerHTML += `
+                                <h3>Check complete</h3>
+                                <p>Based on the results above, make sure your game files are in the correct location.</p>
+                                <p>Next steps: Look at the "How to fix common issues" section below.</p>
+                            ` + resultsDiv.innerHTML;
+                        }
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

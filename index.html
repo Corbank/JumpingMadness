@@ -94,7 +94,44 @@
         document.getElementById('play-button').addEventListener('click', function(e) {
             e.preventDefault();
             const gameContainer = document.getElementById('game-container');
-            gameContainer.innerHTML = '<iframe src="WebGLBuild/index.html" allow="autoplay; fullscreen"></iframe>';
+            
+            // Show loading message
+            gameContainer.innerHTML = '<div style="color: white; padding: 20px;">Loading game...</div>';
+            
+            // Check if the game exists at the specified path
+            fetch('WebGLBuild/index.html')
+                .then(response => {
+                    if (response.ok) {
+                        // The file exists, load the game
+                        gameContainer.innerHTML = '<iframe src="WebGLBuild/index.html" allow="autoplay; fullscreen; pointer-lock"></iframe>';
+                    } else {
+                        // Try alternative path
+                        return fetch('Build/index.html');
+                    }
+                })
+                .then(response => {
+                    if (response && response.ok) {
+                        gameContainer.innerHTML = '<iframe src="Build/index.html" allow="autoplay; fullscreen; pointer-lock"></iframe>';
+                    } else {
+                        throw new Error('Game not found');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading game:', error);
+                    gameContainer.innerHTML = `
+                        <div style="color: red; padding: 20px;">
+                            <p>Unable to load the game. Please check the following:</p>
+                            <ul style="text-align: left; margin: 0 auto; display: inline-block;">
+                                <li>Ensure the game build is in WebGLBuild/ or Build/ folder</li>
+                                <li>Make sure you're using a web server (file:// protocol won't work)</li>
+                                <li>Check browser console for detailed errors</li>
+                            </ul>
+                            <p style="margin-top: 20px;">
+                                <a href="#" class="play-button" onclick="location.reload()">Try Again</a>
+                            </p>
+                        </div>
+                    `;
+                });
         });
     </script>
 </body>
