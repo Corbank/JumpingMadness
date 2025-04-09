@@ -59,12 +59,29 @@ For testing locally, you need to serve the files using a web server:
 ```bash
 # Using Python 3
 python -m http.server
-
-# Using Node.js (after installing http-server)
-npx http-server
 ```
 
 Then visit `http://localhost:8000` in your browser.
+
+## Further Development Tips
+
+### Unity WebGL Settings
+
+To ensure the best web experience:
+
+1. In Unity, go to Edit > Project Settings > Player
+2. Under WebGL settings tab:
+   - Set "Compression Format" to Gzip
+   - Enable "Data Caching"
+   - Set appropriate "Memory Size"
+   - Consider lowering texture quality for better performance
+
+### Optimizing for Web
+
+1. Reduce texture sizes and polygon counts
+2. Minimize scene loading times by optimizing assets
+3. Test on multiple browsers (Chrome, Firefox, Safari)
+4. Add loading progress indicators using Unity's built-in APIs
 
 ## Troubleshooting
 

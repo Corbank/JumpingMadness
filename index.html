@@ -128,77 +128,99 @@
                 </div>
             `;
             
-            // Try these paths in order
-            const possiblePaths = [
+            // Define game paths to try
+            const gamePaths = [
                 'WebGLBuild/index.html',
                 'Build/index.html',
-                'WebGLBuild/Build/index.html',
-                'WebGL/index.html'
+                'WebGL/index.html',
+                'docs/WebGLBuild/index.html',
+                'JumpingMadness/WebGLBuild/index.html'
             ];
             
-            // Try to find the game at any of these paths
-            tryLoadingGame(possiblePaths, 0);
+            // Check each path in sequence
+            checkGamePath(0);
             
-            function tryLoadingGame(paths, index) {
-                if (index >= paths.length) {
-                    // All paths failed, show error
+            function checkGamePath(index) {
+                if (index >= gamePaths.length) {
+                    // If we've checked all paths and found nothing, show error
                     showError();
                     return;
                 }
                 
-                const path = paths[index];
-                console.log(`Trying to load game from: ${path}`);
+                const path = gamePaths[index];
+                console.log(`Checking for game at: ${path}`);
                 
                 fetch(path)
                     .then(response => {
                         if (response.ok) {
-                            console.log(`Found game at: ${path}`);
-                            loadGameFromPath(path);
+                            console.log(`Game found at: ${path}`);
+                            loadGame(path);
                         } else {
-                            // Try next path
-                            tryLoadingGame(paths, index + 1);
+                            // Try the next path
+                            checkGamePath(index + 1);
                         }
                     })
                     .catch(error => {
-                        console.warn(`Error checking path ${path}:`, error);
-                        // Try next path
-                        tryLoadingGame(paths, index + 1);
+                        console.warn(`Error checking ${path}:`, error);
+                        // Try the next path
+                        checkGamePath(index + 1);
                     });
             }
             
-            function loadGameFromPath(path) {
-                gameContainer.innerHTML = `<iframe src="${path}" allow="autoplay; fullscreen; pointer-lock"></iframe>`;
+            function loadGame(path) {
+                gameContainer.innerHTML = `<iframe id="game-frame" src="${path}" allow="autoplay; fullscreen; pointer-lock"></iframe>`;
                 
-                // Add event listener to handle potential errors after loading
-                const iframe = gameContainer.querySelector('iframe');
-                iframe.onerror = showError;
+                const iframe = document.getElementById('game-frame');
+                
+                // Add additional error handling for the iframe
+                iframe.onerror = function() {
+                    console.error("Error loading iframe");
+                    showError();
+                };
+                
+                // Set a timeout in case the game doesn't load properly
+                const loadTimeout = setTimeout(function() {
+                    // If iframe content is still not interactive after timeout
+                    try {
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        if (!iframeDoc || iframeDoc.readyState !== 'complete') {
+                            console.warn("Game load timed out");
+                            showError();
+                        }
+                    } catch (e) {
+                        // Cross-origin issues might prevent accessing iframe document
+                        console.log("Can't check iframe content - assuming it's loaded");
+                    }
+                }, 15000); // 15 second timeout
+                
                 iframe.onload = function() {
-                    console.log('Game iframe loaded successfully');
+                    clearTimeout(loadTimeout);
+                    console.log("Game iframe loaded successfully");
                 };
             }
             
             function showError() {
-                console.error('Failed to load the game from any known location');
                 gameContainer.innerHTML = `
-                    <div style="color: red; padding: 20px;">
-                        <h3>Unable to load the game</h3>
-                        <p>Please check the following:</p>
-                        <ul style="text-align: left; margin: 0 auto; display: inline-block;">
-                            <li>Ensure the game build is in one of these locations:
+                    <div style="padding: 20px; text-align: left;">
+                        <h3 style="color: #ff5555; text-align: center;">Game Loading Failed</h3>
+                        
+                        <p>The game could not be loaded. Please try the following:</p>
+                        
+                        <ol>
+                            <li><strong>Verify WebGL support:</strong> Make sure your browser supports WebGL.
                                 <ul>
-                                    <li>WebGLBuild/index.html</li>
-                                    <li>Build/index.html</li>
-                                    <li>WebGLBuild/Build/index.html</li>
-                                    <li>WebGL/index.html</li>
+                                    <li>Visit <a href="https://get.webgl.org/" target="_blank" style="color: #4CAF50;">https://get.webgl.org/</a> to check</li>
+                                    <li>Try using Chrome or Firefox as they have the best WebGL support</li>
                                 </ul>
                             </li>
-                            <li>Make sure you're using a web server (file:// protocol won't work)</li>
-                            <li>Check that your browser supports WebGL</li>
-                            <li>Check browser console (F12) for detailed errors</li>
-                        </ul>
-                        <p style="margin-top: 20px;">
+                            <li><strong>Check your internet connection</strong></li>
+                            <li><strong>Try disabling browser extensions</strong> that might be blocking content</li>
+                            <li><strong>Clear your browser cache</strong> and reload the page</li>
+                        </ol>
+                        
+                        <div style="text-align: center; margin-top: 20px;">
                             <a href="#" class="play-button" onclick="location.reload()">Try Again</a>
-                        </p>
+                        </div>
                     </div>
                 `;
             }
