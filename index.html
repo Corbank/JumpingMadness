@@ -66,6 +66,31 @@
             font-size: 0.9em;
             color: #999;
         }
+        .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .spinner {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid #4CAF50;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -95,43 +120,88 @@
             e.preventDefault();
             const gameContainer = document.getElementById('game-container');
             
-            // Show loading message
-            gameContainer.innerHTML = '<div style="color: white; padding: 20px;">Loading game...</div>';
+            // Show loading animation
+            gameContainer.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div>Loading game...</div>
+                </div>
+            `;
             
-            // Check if the game exists at the specified path
-            fetch('WebGLBuild/index.html')
-                .then(response => {
-                    if (response.ok) {
-                        // The file exists, load the game
-                        gameContainer.innerHTML = '<iframe src="WebGLBuild/index.html" allow="autoplay; fullscreen; pointer-lock"></iframe>';
-                    } else {
-                        // Try alternative path
-                        return fetch('Build/index.html');
-                    }
-                })
-                .then(response => {
-                    if (response && response.ok) {
-                        gameContainer.innerHTML = '<iframe src="Build/index.html" allow="autoplay; fullscreen; pointer-lock"></iframe>';
-                    } else {
-                        throw new Error('Game not found');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading game:', error);
-                    gameContainer.innerHTML = `
-                        <div style="color: red; padding: 20px;">
-                            <p>Unable to load the game. Please check the following:</p>
-                            <ul style="text-align: left; margin: 0 auto; display: inline-block;">
-                                <li>Ensure the game build is in WebGLBuild/ or Build/ folder</li>
-                                <li>Make sure you're using a web server (file:// protocol won't work)</li>
-                                <li>Check browser console for detailed errors</li>
-                            </ul>
-                            <p style="margin-top: 20px;">
-                                <a href="#" class="play-button" onclick="location.reload()">Try Again</a>
-                            </p>
-                        </div>
-                    `;
-                });
+            // Try these paths in order
+            const possiblePaths = [
+                'WebGLBuild/index.html',
+                'Build/index.html',
+                'WebGLBuild/Build/index.html',
+                'WebGL/index.html'
+            ];
+            
+            // Try to find the game at any of these paths
+            tryLoadingGame(possiblePaths, 0);
+            
+            function tryLoadingGame(paths, index) {
+                if (index >= paths.length) {
+                    // All paths failed, show error
+                    showError();
+                    return;
+                }
+                
+                const path = paths[index];
+                console.log(`Trying to load game from: ${path}`);
+                
+                fetch(path)
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`Found game at: ${path}`);
+                            loadGameFromPath(path);
+                        } else {
+                            // Try next path
+                            tryLoadingGame(paths, index + 1);
+                        }
+                    })
+                    .catch(error => {
+                        console.warn(`Error checking path ${path}:`, error);
+                        // Try next path
+                        tryLoadingGame(paths, index + 1);
+                    });
+            }
+            
+            function loadGameFromPath(path) {
+                gameContainer.innerHTML = `<iframe src="${path}" allow="autoplay; fullscreen; pointer-lock"></iframe>`;
+                
+                // Add event listener to handle potential errors after loading
+                const iframe = gameContainer.querySelector('iframe');
+                iframe.onerror = showError;
+                iframe.onload = function() {
+                    console.log('Game iframe loaded successfully');
+                };
+            }
+            
+            function showError() {
+                console.error('Failed to load the game from any known location');
+                gameContainer.innerHTML = `
+                    <div style="color: red; padding: 20px;">
+                        <h3>Unable to load the game</h3>
+                        <p>Please check the following:</p>
+                        <ul style="text-align: left; margin: 0 auto; display: inline-block;">
+                            <li>Ensure the game build is in one of these locations:
+                                <ul>
+                                    <li>WebGLBuild/index.html</li>
+                                    <li>Build/index.html</li>
+                                    <li>WebGLBuild/Build/index.html</li>
+                                    <li>WebGL/index.html</li>
+                                </ul>
+                            </li>
+                            <li>Make sure you're using a web server (file:// protocol won't work)</li>
+                            <li>Check that your browser supports WebGL</li>
+                            <li>Check browser console (F12) for detailed errors</li>
+                        </ul>
+                        <p style="margin-top: 20px;">
+                            <a href="#" class="play-button" onclick="location.reload()">Try Again</a>
+                        </p>
+                    </div>
+                `;
+            }
         });
     </script>
 </body>

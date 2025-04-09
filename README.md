@@ -2,8 +2,6 @@
 
 A fun platformer game built with Unity where players test their reflexes by jumping over obstacles and collecting items.
 
-![Jumping Madness Screenshot](screenshots/gameplay.png)
-
 ## Play Online
 
 Visit [https://Corbank.github.io/JumpingMadness] to play the game directly in your browser.
@@ -25,14 +23,14 @@ Visit [https://Corbank.github.io/JumpingMadness] to play the game directly in yo
 
 ### Prerequisites
 
-- Unity 2020.3 or newer
+- Unity 2022.3 or newer
 - WebGL build support module installed in Unity
 
 ### Running Locally
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/JumpingMadness.git
+   git clone https://github.com/Corbank/JumpingMadness.git
    ```
 
 2. Open the project in Unity:
@@ -52,7 +50,7 @@ Visit [https://Corbank.github.io/JumpingMadness] to play the game directly in yo
 2. Push your changes to GitHub
 3. Go to your repository settings, select "Pages"
 4. Set the source to "main" branch and save
-5. Your game will be available at https://yourusername.github.io/JumpingMadness
+5. Your game will be available at https://Corbank.github.io/JumpingMadness
 
 ### Local Testing
 
